@@ -256,15 +256,17 @@ def evaluate(sim_env, action, approximator, iteration=1):
             score -= 10000
         val += approximator.value(new_board) + score
     return val / iteration
-file_id = "1REsbdgeiioh3V0uwOfCSbicj2-HzT7ZL"
-output_file = 'approximator.pkl'
+file_id = "1qcBafzbxlrMERaOTyrTkKZOBiPCgp-CY" # approximator_Final.pkl
+#"1REsbdgeiioh3V0uwOfCSbicj2-HzT7ZL" # approximator.pkl
+output_file = 'approximator_Final.pkl'
 gdown.download(f'https://drive.google.com/uc?id={file_id}', output_file, quiet=False)
-approximator = load_remapped_pickle('approximator.pkl')
+approximator = load_remapped_pickle('approximator_Fina;.pkl')
+cnt = 0
 def get_action(state, score):
     env = Game2048Env()
     env.board = copy.deepcopy(state)
     env.score = score
-    td_mcts = TD_MCTS(approximator, iterations=2000, exploration_constant=100, rollout_depth=0)
+    td_mcts = TD_MCTS(approximator, iterations=100, exploration_constant=100, rollout_depth=0)
     root = TD_MCTS_Node()
     root.untried_actions = [a for a in range(4) if env.is_move_legal(a)]
     
@@ -272,5 +274,7 @@ def get_action(state, score):
         td_mcts.run_simulation(root, env)
         
     best_action, visit_distribution = td_mcts.best_action_distribution(root)
-    #print(f"Best action: {best_action}, Value: {best_value}")
+    cnt += 1
+    if cnt % 1000 == 0:
+        print(f"Simulation count: {cnt},Board:\n{env.board}, Score: {env.score}")
     return best_action
