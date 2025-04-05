@@ -247,7 +247,7 @@ class Game2048Env(gym.Env):
 
 
 
-def evaluate(sim_env, action, approximator, iteration=4):
+def evaluate(sim_env, action, approximator, iteration=1):
     val = 0
     for _ in range(iteration):
         temp_env = copy.deepcopy(sim_env)
@@ -259,8 +259,8 @@ def evaluate(sim_env, action, approximator, iteration=4):
 file_id = "1REsbdgeiioh3V0uwOfCSbicj2-HzT7ZL"
 output_file = 'approximator.pkl'
 gdown.download(f'https://drive.google.com/uc?id={file_id}', output_file, quiet=False)
+approximator = load_remapped_pickle('approximator.pkl')
 def get_action(state, score):
-    approximator = load_remapped_pickle('approximator.pkl')
     env = Game2048Env()
     env.board = copy.deepcopy(state)
     env.score = score
@@ -273,5 +273,5 @@ def get_action(state, score):
             if val_a > best_value:
                 best_value = val_a
                 best_action = action
-    #print(f"Best action: {best_action}, Value: {best_value}")
+    print(f"Best action: {best_action}, Value: {best_value}")
     return best_action
