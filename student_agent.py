@@ -260,7 +260,7 @@ file_id = "1qcBafzbxlrMERaOTyrTkKZOBiPCgp-CY" # approximator_Final.pkl
 #"1REsbdgeiioh3V0uwOfCSbicj2-HzT7ZL" # approximator.pkl
 output_file = 'approximator_Final.pkl'
 gdown.download(f'https://drive.google.com/uc?id={file_id}', output_file, quiet=False)
-approximator = load_remapped_pickle('approximator_Fina;.pkl')
+approximator = load_remapped_pickle('approximator_Final.pkl')
 cnt = 0
 def get_action(state, score):
     env = Game2048Env()
