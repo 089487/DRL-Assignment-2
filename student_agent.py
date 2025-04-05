@@ -264,14 +264,13 @@ def get_action(state, score):
     env = Game2048Env()
     env.board = copy.deepcopy(state)
     env.score = score
+    td_mcts = TD_MCTS(approximator, iterations=2000, exploration_constant=100, rollout_depth=0)
+    root = TD_MCTS_Node()
+    root.untried_actions = [a for a in range(4) if env.is_move_legal(a)]
     
-    best_action = None
-    best_value = -float('inf')
-    for action in range(4):
-        if env.is_move_legal(action):
-            val_a = evaluate(env, action, approximator)
-            if val_a > best_value:
-                best_value = val_a
-                best_action = action
-    print(f"Best action: {best_action}, Value: {best_value}")
+    for _ in range(td_mcts.iterations):
+        td_mcts.run_simulation(root, env)
+        
+    best_action, visit_distribution = td_mcts.best_action_distribution(root)
+    #print(f"Best action: {best_action}, Value: {best_value}")
     return best_action
