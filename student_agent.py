@@ -256,7 +256,7 @@ def evaluate(sim_env, action, approximator, iteration=4):
             score -= 10000
         val += approximator.value(new_board) + score
     return val / iteration
-file_id = '1REsbdgeiioh3V0uwOfCSbicj2-HzT7ZLq'
+file_id = "1REsbdgeiioh3V0uwOfCSbicj2-HzT7ZL"
 output_file = 'approximator.pkl'
 gdown.download(f'https://drive.google.com/uc?id={file_id}', output_file, quiet=False)
 def get_action(state, score):
