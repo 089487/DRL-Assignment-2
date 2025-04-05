@@ -8,7 +8,8 @@ import matplotlib.pyplot as plt
 import copy
 import random
 import math
-
+from approximator import NTupleApproximator
+from TD_MCTS import TD_MCTS, TD_MCTS_Node
 
 class Game2048Env(gym.Env):
     def __init__(self):
@@ -231,9 +232,36 @@ class Game2048Env(gym.Env):
         # If the simulated board is different from the current board, the move is legal
         return not np.array_equal(self.board, temp_board)
 
+
+patterns = [
+# straight
+[(0, 0), (1, 0), (2, 0), (3, 0)],
+[(0, 1), (1, 1), (2, 1), (3, 1)],
+# Square patterns (2x3)
+[(0, 0), (1, 0), (2, 0),
+(0, 1), (1, 1), (2, 1)],
+[(0, 1), (1, 1), (2, 1),
+(0, 2), (1, 2), (2, 2)]
+]
+
+# Load the trained approximator
+approximator = NTupleApproximator(board_size=4,patterns=patterns)
+print('hehe')
+with open('approximator.pkl', 'rb') as f:
+    approximator = pickle.load(f)
+print("Approximator loaded successfully!")
+
 def get_action(state, score):
     env = Game2048Env()
-    return random.choice([0, 1, 2, 3]) # Choose a random action
+    env.state = copy.deepcopy(state)
+    td_mcts = TD_MCTS(approximator, iterations=50, exploration_constant=100, rollout_depth=0)
+    root = TD_MCTS_Node()
+    root.untried_actions = [a for a in range(4) if env.is_move_legal(a)]
+    
+    for _ in range(td_mcts.iterations):
+        td_mcts.run_simulation(root, env)
+    best_action, visit_distribution = td_mcts.best_action_distribution(root)
+    return best_action # Choose a random action
     
     # You can submit this random agent to evaluate the performance of a purely random strategy.
 
