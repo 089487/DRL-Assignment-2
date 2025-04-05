@@ -80,8 +80,4 @@ def get_approximator():
     (0, 2), (1, 2), (2, 2)]
     ]
     approximator = NTupleApproximator(board_size=4,patterns=patterns)
-    with open('approximator.pkl', 'rb') as f:
-        approximator = pickle.load(f)
-    
-    print("Approximator loaded successfully!")
     return approximator

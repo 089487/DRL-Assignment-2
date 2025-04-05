@@ -10,6 +10,19 @@ import random
 import math
 from approximator import NTupleApproximator
 from TD_MCTS import TD_MCTS, TD_MCTS_Node
+import gdown
+
+# Custom Unpickler to remap __main__.NTupleApproximator to approximator.NTupleApproximator
+class RemapUnpickler(pickle.Unpickler):
+    def find_class(self, module, name):
+        if module == "__main__" and name == "NTupleApproximator":
+            from approximator import NTupleApproximator
+            return NTupleApproximator
+        return super().find_class(module, name)
+
+def load_remapped_pickle(file_path):
+    with open(file_path, 'rb') as f:
+        return RemapUnpickler(f).load()
 
 class Game2048Env(gym.Env):
     def __init__(self):
@@ -233,36 +246,32 @@ class Game2048Env(gym.Env):
         return not np.array_equal(self.board, temp_board)
 
 
-patterns = [
-# straight
-[(0, 0), (1, 0), (2, 0), (3, 0)],
-[(0, 1), (1, 1), (2, 1), (3, 1)],
-# Square patterns (2x3)
-[(0, 0), (1, 0), (2, 0),
-(0, 1), (1, 1), (2, 1)],
-[(0, 1), (1, 1), (2, 1),
-(0, 2), (1, 2), (2, 2)]
-]
 
-# Load the trained approximator
-approximator = NTupleApproximator(board_size=4,patterns=patterns)
-print('hehe')
-with open('approximator.pkl', 'rb') as f:
-    approximator = pickle.load(f)
-print("Approximator loaded successfully!")
-
+def evaluate(sim_env, action, approximator, iteration=4):
+    val = 0
+    for _ in range(iteration):
+        temp_env = copy.deepcopy(sim_env)
+        new_board, score, _done, _ = temp_env.step(action)
+        if _done:
+            score -= 10000
+        val += approximator.value(new_board) + score
+    return val / iteration
+file_id = '1REsbdgeiioh3V0uwOfCSbicj2-HzT7ZLq'
+output_file = 'approximator.pkl'
+gdown.download(f'https://drive.google.com/uc?id={file_id}', output_file, quiet=False)
 def get_action(state, score):
+    approximator = load_remapped_pickle('approximator.pkl')
     env = Game2048Env()
-    env.state = copy.deepcopy(state)
-    td_mcts = TD_MCTS(approximator, iterations=50, exploration_constant=100, rollout_depth=0)
-    root = TD_MCTS_Node()
-    root.untried_actions = [a for a in range(4) if env.is_move_legal(a)]
+    env.board = copy.deepcopy(state)
+    env.score = score
     
-    for _ in range(td_mcts.iterations):
-        td_mcts.run_simulation(root, env)
-    best_action, visit_distribution = td_mcts.best_action_distribution(root)
-    return best_action # Choose a random action
-    
-    # You can submit this random agent to evaluate the performance of a purely random strategy.
-
-
+    best_action = None
+    best_value = -float('inf')
+    for action in range(4):
+        if env.is_move_legal(action):
+            val_a = evaluate(env, action, approximator)
+            if val_a > best_value:
+                best_value = val_a
+                best_action = action
+    #print(f"Best action: {best_action}, Value: {best_value}")
+    return best_action
