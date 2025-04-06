@@ -256,11 +256,11 @@ def evaluate(sim_env, action, approximator, iteration=1):
             score -= 10000
         val += approximator.value(new_board) + score
     return val / iteration
-file_id = "1qcBafzbxlrMERaOTyrTkKZOBiPCgp-CY" # approximator_Final.pkl
-#"1REsbdgeiioh3V0uwOfCSbicj2-HzT7ZL" # approximator.pkl
-output_file = 'approximator_Final.pkl'
+#file_id = #"1qcBafzbxlrMERaOTyrTkKZOBiPCgp-CY" # approximator_Final.pkl
+file_id = "1REsbdgeiioh3V0uwOfCSbicj2-HzT7ZL" # approximator.pkl
+output_file = 'approximator.pkl'
 gdown.download(f'https://drive.google.com/uc?id={file_id}', output_file, quiet=False)
-approximator = load_remapped_pickle('approximator_Final.pkl')
+approximator = load_remapped_pickle('approximator.pkl')
 cnt = 0
 def get_action(state, score):
     global cnt
