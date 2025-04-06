@@ -63,7 +63,7 @@ class TD_MCTS:
                 new_board, score, _done, _ = temp_env.step(a)
                 
                 if _done:
-                    score -= 10000
+                    score -= 20000
                 val_a += self.approximator.value(new_board) + score
             if val_a > val_best:
                 val_best = val_a
