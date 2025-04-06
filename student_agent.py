@@ -263,6 +263,7 @@ gdown.download(f'https://drive.google.com/uc?id={file_id}', output_file, quiet=F
 approximator = load_remapped_pickle('approximator_Final.pkl')
 cnt = 0
 def get_action(state, score):
+    global cnt
     env = Game2048Env()
     env.board = copy.deepcopy(state)
     env.score = score
