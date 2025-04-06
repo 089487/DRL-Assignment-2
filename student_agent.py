@@ -264,7 +264,7 @@ if not os.path.exists(output_file):
     gdown.download(f'https://drive.google.com/uc?id={file_id}', output_file, quiet=False)
 approximator = load_remapped_pickle('approximator.pkl')
 cnt = 0
-td_mcts = TD_MCTS(approximator, iterations=100, exploration_constant=100, rollout_depth=0)
+td_mcts = TD_MCTS(approximator, iterations=200, exploration_constant=100, rollout_depth=0)
 root = TD_MCTS_Node()
 env = Game2048Env()
 def get_action(state, score):
