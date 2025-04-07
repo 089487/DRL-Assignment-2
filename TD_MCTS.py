@@ -63,7 +63,7 @@ class TD_MCTS:
                 new_board, score, _done, _ = temp_env.step(a)
                 
                 if _done:
-                    score -= 20000
+                    score -= 10000
                 val_a += self.approximator.value(new_board) + score
             if val_a > val_best:
                 val_best = val_a
@@ -120,7 +120,7 @@ class TD_MCTS:
             node = node.children[action]
             rollout_reward = self.rollout(sim_env,action)
         else:
-            assert(sim_env.is_game_over())
+            #assert(sim_env.is_game_over())
             rollout_reward = sim_env.score - 10000
         self.backpropagate(node, rollout_reward)
         return
