@@ -264,15 +264,15 @@ if not os.path.exists(output_file):
     gdown.download(f'https://drive.google.com/uc?id={file_id}', output_file, quiet=False)
 approximator = load_remapped_pickle('approximator.pkl')
 cnt = 0
-td_mcts = TD_MCTS(approximator, iterations=200, exploration_constant=100, rollout_depth=0)
-root = TD_MCTS_Node()
+td_mcts = TD_MCTS(approximator, iterations=50, exploration_constant=100, rollout_depth=0)
+
 env = Game2048Env()
 def get_action(state, score):
     global cnt, root, env
     env.board = copy.deepcopy(state)
     env.score = score
+    root = TD_MCTS_Node()
     root.untried_actions = [a for a in range(4) if env.is_move_legal(a)]
-    
     for _ in range(td_mcts.iterations):
         td_mcts.run_simulation(root, env)
         
@@ -283,3 +283,4 @@ def get_action(state, score):
     root = root.children[best_action]
     root.parent = None  # Reset parent for the next iteration
     return best_action
+#start training at 22:11
