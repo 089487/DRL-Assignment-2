@@ -2,7 +2,6 @@ import copy
 import random
 import math
 import numpy as np
-from approximator import NTupleApproximator
 
 # Note: This MCTS implementation is almost identical to the previous one,
 # except for the rollout phase, which now incorporates the approximator.
@@ -43,14 +42,13 @@ class TD_MCTS:
         new_env.score = score
         return new_env
 
-    def select_child(self, node,legal_moves):
+    def select_child(self, node):
         # TODO: Use the UCT formula: Q + c * sqrt(log(parent_visits)/child_visits) to select the child
         """for x in node.children.items():
             print(x[1].total_reward/x[1].visits,self.c * np.sqrt(np.log(node.visits)/x[1].visits))"""
         #max_reward = max([x.total_reward/x.visits for x in node.children.values()])
         #min_reward = min([x.total_reward/x.visits for x in node.children.values()])
-        #max key should be the one with the highest value of Q + c * sqrt(log(parent_visits)/child_visits) and in legal_moves
-        max_key = max(node.children.keys(), key=lambda x: (node.children[x].total_reward/node.children[x].visits) + self.c * np.sqrt(np.log(node.visits)/node.children[x].visits) if node.children[x].visits > 0 and x in legal_moves else float('-inf'))
+        max_key = max(node.children.items(), key=lambda x: x[1].total_reward/x[1].visits + self.c * np.sqrt(np.log(node.visits)/x[1].visits))[0]
         return node.children[max_key]
     def get_best_action(self,sim_env,legal_moves=None):
         val_best = float('-inf')
@@ -105,8 +103,7 @@ class TD_MCTS:
         done = sim_env.is_game_over()
         l2 = [i for i in node.untried_actions if sim_env.is_move_legal(i)]
         while not done and (node.fully_expanded() or not l2):
-            legal_moves = [a for a in range(4) if sim_env.is_move_legal(a)]
-            node = self.select_child(node,legal_moves)
+            node = self.select_child(node)
             _,_,done,_ = sim_env.step(node.action)
             l2 = [i for i in node.untried_actions if sim_env.is_move_legal(i)]
 
@@ -122,7 +119,7 @@ class TD_MCTS:
             node = node.children[action]
             rollout_reward = self.rollout(sim_env,action)
         else:
-            #assert(sim_env.is_game_over())
+            assert(sim_env.is_game_over())
             rollout_reward = sim_env.score - 10000
         self.backpropagate(node, rollout_reward)
         return

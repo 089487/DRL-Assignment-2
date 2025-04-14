@@ -247,7 +247,7 @@ class Game2048Env(gym.Env):
 
 
 
-def evaluate(sim_env, action, approximator, iteration=1):
+def evaluate(sim_env, action, approximator, iteration=4):
     val = 0
     for _ in range(iteration):
         temp_env = copy.deepcopy(sim_env)
@@ -264,11 +264,11 @@ if not os.path.exists(output_file):
     gdown.download(f'https://drive.google.com/uc?id={file_id}', output_file, quiet=False)
 approximator = load_remapped_pickle('approximator.pkl')
 cnt = 0
-td_mcts = TD_MCTS(approximator, iterations=50, exploration_constant=100, rollout_depth=0)
+td_mcts = TD_MCTS(approximator, iterations=25, exploration_constant=100, rollout_depth=0)
 
 env = Game2048Env()
 def get_action(state, score):
-    global cnt, root, env
+    global cnt, env
     env.board = copy.deepcopy(state)
     env.score = score
     root = TD_MCTS_Node()
@@ -278,9 +278,7 @@ def get_action(state, score):
         
     best_action, visit_distribution = td_mcts.best_action_distribution(root)
     cnt += 1
-    if cnt % 200 == 0:
+    if cnt % 20 == 0:
         print(f"Simulation count: {cnt},Board:\n{env.board}, Score: {env.score}")
-    root = root.children[best_action]
-    root.parent = None  # Reset parent for the next iteration
     return best_action
 #start training at 22:11
