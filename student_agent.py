@@ -264,7 +264,7 @@ if not os.path.exists(output_file):
     gdown.download(f'https://drive.google.com/uc?id={file_id}', output_file, quiet=False)
 approximator = load_remapped_pickle('approximator.pkl')
 cnt = 0
-td_mcts = TD_MCTS(approximator, iterations=25, exploration_constant=100, rollout_depth=0)
+td_mcts = TD_MCTS(approximator, iterations=1000, exploration_constant=100, rollout_depth=0)
 
 env = Game2048Env()
 def get_action(state, score):
@@ -278,7 +278,7 @@ def get_action(state, score):
         
     best_action, visit_distribution = td_mcts.best_action_distribution(root)
     cnt += 1
-    if cnt % 20 == 0:
-        print(f"Simulation count: {cnt},Board:\n{env.board}, Score: {env.score}")
+    """if cnt % 200 == 0:
+        print(f"Simulation count: {cnt},Board:\n{env.board}, Score: {env.score}")"""
     return best_action
 #start training at 22:11
